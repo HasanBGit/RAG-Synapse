@@ -23,7 +23,7 @@ app = FastAPI(title="RAG Synapse")
 # CORS middleware for React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Restrict to specific origins
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -49,12 +49,13 @@ COLLECTION_NAME = "documents"
 # Ensure collection exists
 try:
     qdrant_client.get_collection(COLLECTION_NAME)
-except Exception:
+except Exception as e:
     # Create collection if it doesn't exist
-    qdrant_client.create_collection(
-        collection_name=COLLECTION_NAME,
-        vectors_config=VectorParams(size=1536, distance=Distance.COSINE),
-    )
+    if "not found" in str(e).lower() or "doesn't exist" in str(e).lower():
+        qdrant_client.create_collection(
+            collection_name=COLLECTION_NAME,
+            vectors_config=VectorParams(size=1536, distance=Distance.COSINE),
+        )
 
 # Text splitter configuration (1000 chunk size, 150 overlap)
 text_splitter = RecursiveCharacterTextSplitter(
@@ -67,8 +68,8 @@ text_splitter = RecursiveCharacterTextSplitter(
 def extract_text_from_pdf(file_path: str) -> List[tuple]:
     """Extract text from PDF with page numbers."""
     texts = []
-    with open(file_path, 'rb') as file:
-        pdf_reader = PyPDF2.PdfReader(file)
+    with open(file_path, 'rb') as pdf_file:
+        pdf_reader = PyPDF2.PdfReader(pdf_file)
         for page_num, page in enumerate(pdf_reader.pages, start=1):
             text = page.extract_text()
             if text.strip():
@@ -89,8 +90,8 @@ def extract_text_from_docx(file_path: str) -> List[tuple]:
 
 def extract_text_from_txt(file_path: str) -> List[tuple]:
     """Extract text from TXT file."""
-    with open(file_path, 'r', encoding='utf-8') as file:
-        text = file.read()
+    with open(file_path, 'r', encoding='utf-8') as txt_file:
+        text = txt_file.read()
     return [(text, 1)] if text.strip() else []
 
 
@@ -193,7 +194,9 @@ async def upload_document(file: UploadFile = File(...)):
             os.unlink(tmp_file_path)
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing document: {str(e)}")
+        # Log the full error for debugging
+        print(f"Error in upload endpoint: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error processing document. Please check the file format and try again.")
 
 
 @app.post("/chat", response_model=ChatResponse)
@@ -260,7 +263,9 @@ Answer (remember to include citations):"""
         )
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing chat request: {str(e)}")
+        # Log the full error for debugging
+        print(f"Error processing chat request: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error processing your request. Please try again.")
 
 
 @app.delete("/documents/{doc_id}")
@@ -292,7 +297,9 @@ async def delete_document(doc_id: str):
             raise HTTPException(status_code=404, detail="Document not found")
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error deleting document: {str(e)}")
+        # Log the full error for debugging
+        print(f"Error deleting document: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error deleting document. Please try again.")
 
 
 if __name__ == "__main__":

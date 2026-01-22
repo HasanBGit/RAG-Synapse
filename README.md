@@ -271,6 +271,11 @@ Ensure production environment variables are set:
 - `QDRANT_URL`: Your Qdrant instance URL
 - `REACT_APP_API_URL`: Your backend API URL (for frontend)
 
+**Important**: Update CORS settings in `main.py` to match your production frontend URL:
+```python
+allow_origins=["https://your-frontend-domain.com"]
+```
+
 ## Limitations
 
 - Maximum file size depends on your server configuration
