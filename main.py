@@ -36,8 +36,11 @@ QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 if not OPENAI_API_KEY:
     raise ValueError("OPENAI_API_KEY not found in environment variables")
 
-embeddings = OpenAIEmbeddings(openai_api_key=OPENAI_API_KEY)
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0, openai_api_key=OPENAI_API_KEY)
+# Set environment variable for OpenAI SDK
+os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+
+embeddings = OpenAIEmbeddings()
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
 qdrant_client = QdrantClient(url=QDRANT_URL)
 
 # Collection name
