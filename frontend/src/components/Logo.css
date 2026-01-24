@@ -1,0 +1,46 @@
+/* Logo Component - Using Actual Image Files */
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Size Variants */
+.logo-small .logo-image {
+  width: 120px;
+  height: auto;
+  max-height: 50px;
+}
+
+.logo-medium .logo-image {
+  width: 200px;
+  height: auto;
+  max-height: 80px;
+}
+
+.logo-large .logo-image {
+  width: 300px;
+  height: auto;
+  max-height: 150px;
+}
+
+/* Empty State Logo */
+.logo-container.empty-state-logo {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.logo-container.empty-state-logo .logo-image {
+  width: 300px;
+  height: auto;
+  max-height: 150px;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}

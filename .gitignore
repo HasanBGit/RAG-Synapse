@@ -49,3 +49,15 @@ yarn-error.log*
 # React build
 frontend/build/
 frontend/dist/
+
+# Logs
+logs/
+*.log
+
+# Database files
+chroma_db/
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal

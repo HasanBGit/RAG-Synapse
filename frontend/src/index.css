@@ -1,21 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;600;700&display=swap');
+
+:root {
+  /* Brand Colors */
+  --color-primary-blue: #01acd3;
+  --color-secondary-sage: #7a8f78;
+  --color-accent-teal: #3b9b9f;
+  --color-accent-brown: #b17f5c;
+  
+  /* Logo Colors (from images) */
+  --color-logo-teal: #307D98;
+  --color-logo-blue: #667eea;
+  --color-logo-orange: #E2954C;
+  
+  /* Neutral Colors - Dark Theme */
+  --color-white: #1a1a1a;
+  --color-off-white: #252525;
+  --color-light-grey: #2a2a2a;
+  --color-grey: #3a3a3a;
+  --color-dark-grey: #b0b0b0;
+  --color-text: #e0e0e0;
+  --color-text-light: #b0b0b0;
+  
+  /* Spacing System */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;     /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* Shadows - Enhanced */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.15);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  --shadow-citation: 0 2px 8px rgba(1, 172, 211, 0.2);
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Z-index Layers */
+  --z-negative: -1;
+  --z-normal: 1;
+  --z-tooltip: 10;
+  --z-fixed: 100;
+  --z-modal: 1000;
+  
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1280px;
+  --container-2xl: 1400px;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--color-primary-blue) 0%, var(--color-accent-teal) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--color-secondary-sage) 0%, var(--color-accent-teal) 100%);
+  --gradient-hover: linear-gradient(135deg, var(--color-accent-teal) 0%, var(--color-primary-blue) 100%);
+  --gradient-card: linear-gradient(135deg, rgba(1, 172, 211, 0.1) 0%, rgba(59, 155, 159, 0.1) 100%);
+  --gradient-logo: linear-gradient(135deg, var(--color-logo-teal) 0%, var(--color-logo-blue) 50%, var(--color-logo-orange) 100%);
+  
+  /* Glassmorphism - Dark Theme */
+  --glass-bg: rgba(42, 42, 42, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(10px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  
+  /* Borders - Dark Theme */
+  --border-subtle: 1px solid rgba(255, 255, 255, 0.1);
+  --border-light: 1px solid var(--color-grey);
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  padding: 0;
+  height: 100%;
+  font-family: 'Cairo', 'Tajawal', 'Noto Sans Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f9fa 0%, #f1f5f9 100%);
+  direction: rtl;
+  color: #2c3e50;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid var(--color-primary-blue);
+  outline-offset: 2px;
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary-blue);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 0;
 }

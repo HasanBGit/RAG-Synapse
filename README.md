@@ -1,31 +1,32 @@
 # RAG Synapse 🧠
 
-A minimal RAG (Retrieval-Augmented Generation) web application built with Python, FastAPI, LangChain, OpenAI API, and Qdrant. Upload documents and ask questions with AI-powered responses backed by your documents.
+A modern RAG (Retrieval-Augmented Generation) web application built with Python, FastAPI, Qwen3 Embeddings, DeepSeek Chat, and ChromaDB. Upload documents and ask questions with AI-powered responses backed by your documents.
 
 ## Features
 
-- 📄 **Document Upload**: Support for PDF, DOCX, and TXT files
+- 📄 **Document Upload**: Support for PDF, DOCX, and TXT files with drag-and-drop
 - 🔍 **Intelligent Chunking**: Automatically splits documents into 1000-character chunks with 150-character overlap
-- 🧮 **Vector Embeddings**: Uses OpenAI embeddings for semantic search
-- 💾 **Vector Storage**: Stores embeddings in Qdrant with metadata (doc_id, file_name, page, chunk_id)
-- 💬 **Context-Aware Chat**: Retrieves relevant chunks and generates answers using OpenAI GPT
+- 🧮 **Vector Embeddings**: Uses Qwen3-Embedding-8B (4096 dimensions) for superior multilingual semantic search
+- 💾 **Vector Storage**: Stores embeddings in ChromaDB with metadata (doc_id, file_name, page, chunk_id)
+- 💬 **Context-Aware Chat**: Retrieves relevant chunks and generates answers using DeepSeek chat model
 - 📚 **Inline Citations**: Answers include citations in the format [source:file | page | chunk]
 - ✅ **Context-Only Responses**: Refuses to answer when information is not in the uploaded documents
-- ⚛️ **React UI**: Simple and intuitive user interface
+- ⚛️ **Modern React UI**: Beautiful, user-friendly interface with progress indicators and animations
 
 ## Architecture
 
 ```
 ┌─────────────┐     ┌──────────────┐     ┌────────────┐
-│   React UI  │────▶│FastAPI Server│────▶│  Qdrant    │
+│   React UI  │────▶│FastAPI Server│────▶│  ChromaDB  │
 │  (Frontend) │     │  (Backend)   │     │  Vector DB │
 └─────────────┘     └──────────────┘     └────────────┘
                            │
                            ▼
                     ┌──────────────┐
-                    │  OpenAI API  │
+                    │  Qwen3-8B     │
                     │  Embeddings  │
-                    │  + Chat GPT  │
+                    │  + DeepSeek  │
+                    │  Chat Model  │
                     └──────────────┘
 ```
 
@@ -33,8 +34,8 @@ A minimal RAG (Retrieval-Augmented Generation) web application built with Python
 
 - Python 3.8+
 - Node.js 14+
-- Docker (for Qdrant)
-- OpenAI API key
+- Hugging Face API key (get a free one at https://huggingface.co/settings/tokens)
+- DeepSeek API key (get one at https://platform.deepseek.com)
 
 ## Setup
 
@@ -45,15 +46,7 @@ git clone https://github.com/HasanBGit/RAG-Synapse.git
 cd RAG-Synapse
 ```
 
-### 2. Start Qdrant Vector Database
-
-```bash
-docker-compose up -d
-```
-
-This will start Qdrant on `http://localhost:6333`
-
-### 3. Set Up Backend
+### 2. Set Up Backend
 
 #### Install Python Dependencies
 
@@ -69,12 +62,20 @@ Create a `.env` file in the root directory:
 cp .env.example .env
 ```
 
-Edit `.env` and add your OpenAI API key:
+Edit `.env` and add your API keys:
 
 ```
-OPENAI_API_KEY=sk-your-api-key-here
-QDRANT_URL=http://localhost:6333
+HF_API_KEY=hf_your-huggingface-api-key-here
+HF_PROVIDER=default
+DEEPSEEK_API_KEY=sk-your-deepseek-api-key-here
+CHROMA_DB_PATH=./chroma_db
 ```
+
+**Note**: 
+- Get your free Hugging Face API key at: https://huggingface.co/settings/tokens
+- `HF_PROVIDER` is optional - use "scaleway" or other providers if you have access (default: "default")
+- Embeddings are generated using Hugging Face Inference API (no local model download needed)
+- DeepSeek API key is required for the chat functionality
 
 #### Run the FastAPI Server
 
@@ -84,7 +85,9 @@ python main.py
 
 The API will be available at `http://localhost:8000`
 
-### 4. Set Up Frontend
+**Note**: Embeddings are generated via Hugging Face Inference API - no local model download required!
+
+### 3. Set Up Frontend
 
 #### Install Node Dependencies
 
@@ -105,18 +108,20 @@ The UI will be available at `http://localhost:3000`
 
 ### Upload Documents
 
-1. Click "Choose File" and select a PDF, DOCX, or TXT file
-2. Click "Upload" to process the document
-3. The system will extract text, create chunks, generate embeddings, and store them in Qdrant
+1. **Drag and drop** a PDF, DOCX, or TXT file into the upload area, OR click "Browse Files"
+2. Click **"Upload & Process"** to process the document
+3. Watch the progress bar as the system extracts text, creates chunks, generates embeddings, and stores them in ChromaDB
 
 ### Chat with Your Documents
 
-1. Type a question in the chat input
-2. The system will:
-   - Retrieve the top 5 most relevant chunks from your documents
-   - Send them to OpenAI GPT along with your question
+1. Type a question in the chat input at the bottom
+2. Press Enter or click the send button
+3. The system will:
+   - Generate a query embedding using Qwen3-Embedding-8B
+   - Retrieve the top 5 most relevant chunks from ChromaDB
+   - Send them to DeepSeek chat model along with your question
    - Generate an answer with inline citations
-3. If the answer is not in your documents, the system will refuse to answer and ask a clarifying question
+4. If the answer is not in your documents, the system will refuse to answer and ask a clarifying question
 
 ### Example Citations
 
@@ -187,8 +192,11 @@ Delete a document and all its chunks
    - Overlap: 150 characters
 
 3. **Embeddings**:
-   - OpenAI embeddings (1536 dimensions)
-   - Stored in Qdrant with cosine similarity
+   - Qwen3-Embedding-8B (4096 dimensions)
+   - Generated via Hugging Face Inference API (free tier available)
+   - Uses "query" prompt for better retrieval performance on queries
+   - Stored in ChromaDB with cosine similarity
+   - No local model download required
 
 4. **Metadata**:
    - doc_id: Unique document identifier
@@ -199,10 +207,10 @@ Delete a document and all its chunks
 
 ### Chat System
 
-1. Query embedding generated using OpenAI
-2. Top-k similar chunks retrieved from Qdrant
+1. Query embedding generated using Hugging Face Inference API with Qwen3-Embedding-8B and "query" prompt
+2. Top-k similar chunks retrieved from ChromaDB
 3. Context assembled with source information
-4. Prompt sent to OpenAI GPT-3.5-turbo with strict instructions:
+4. Prompt sent to DeepSeek chat model with strict instructions:
    - Answer ONLY from context
    - Include inline citations
    - Refuse if information not available
@@ -212,18 +220,31 @@ Delete a document and all its chunks
 
 ```
 RAG-Synapse/
-├── main.py                 # FastAPI backend
+├── main.py                 # FastAPI backend entry point
 ├── requirements.txt        # Python dependencies
-├── docker-compose.yml      # Qdrant setup
+├── docker-compose.yml      # (No longer needed - ChromaDB runs locally)
 ├── .env.example           # Environment variables template
 ├── .gitignore             # Git ignore rules
+├── chroma_db/             # ChromaDB data (created automatically)
+├── logs/                  # Log files directory
+├── backend/               # Backend source code
+│   ├── app.py            # FastAPI application
+│   ├── config.py         # Configuration (embeddings, LLM, ChromaDB)
+│   ├── models.py         # Pydantic models
+│   ├── services/         # Business logic
+│   │   ├── document_processor.py
+│   │   └── vector_store.py
+│   └── routes/           # API routes
+│       ├── upload.py
+│       ├── chat.py
+│       └── documents.py
 └── frontend/              # React frontend
     ├── package.json       # Node dependencies
     ├── public/
     │   └── index.html
     └── src/
         ├── App.js         # Main React component
-        ├── App.css        # Styling
+        ├── App.css        # Modern styling
         ├── index.js       # React entry point
         └── index.css      # Global styles
 ```
@@ -267,8 +288,8 @@ Serve the `frontend/build` directory with a static file server or CDN.
 ### Environment Variables
 
 Ensure production environment variables are set:
-- `OPENAI_API_KEY`: Your OpenAI API key
-- `QDRANT_URL`: Your Qdrant instance URL
+- `DEEPSEEK_API_KEY`: Your DeepSeek API key
+- `CHROMA_DB_PATH`: Path to ChromaDB storage (default: ./chroma_db)
 - `REACT_APP_API_URL`: Your backend API URL (for frontend)
 
 **Important**: Update CORS settings in `main.py` to match your production frontend URL:
@@ -279,8 +300,10 @@ allow_origins=["https://your-frontend-domain.com"]
 ## Limitations
 
 - Maximum file size depends on your server configuration
-- OpenAI API rate limits apply
-- Qdrant storage depends on your setup (local volume or cloud)
+- DeepSeek API rate limits apply
+- Hugging Face Inference API rate limits apply (free tier available)
+- ChromaDB storage is local (stored in `./chroma_db` directory)
+- Requires internet connection for embedding generation (via Hugging Face API)
 
 ## Future Enhancements
 
